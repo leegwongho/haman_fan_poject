@@ -1,4 +1,5 @@
 #include "motor.h"
+#include "uart.h"
 
 volatile uint8_t motor_on = 0;
 volatile uint8_t speed = 0;
@@ -57,12 +58,21 @@ void speed_up() {
 		switch (speed) {
 			case 0:
 			OCR0 = LOW;
+			uart_flag2 = 0;
+			uart_flag1 = 0;
+			uart_flag0 = 1;
 			break;
 			case 1:
 			OCR0 = MEDIUM;
+			uart_flag0 = 0;
+			uart_flag2 = 0;
+			uart_flag1 = 1;
 			break;
 			case 2:
 			OCR0 = HIGH;
+			uart_flag1 = 0;
+			uart_flag0 = 0;
+			uart_flag2 = 1;
 			break;
 		}
 	}
