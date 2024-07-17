@@ -1,9 +1,17 @@
 #include "motor.h"
+#include "uart.h"
+
 
 volatile uint8_t motor_on = 0;
 volatile uint8_t speed = 0;
 volatile uint8_t servo_on = 0;
 volatile uint8_t servo_state = 0;
+volatile uint8_t UART_button_on_off = 0;
+volatile uint8_t UART_button_Power = 0;
+volatile uint8_t UART_button_rote = 0;
+
+
+
 
 // GPIO setup
 void gpioInit() {
@@ -118,6 +126,23 @@ ISR(INT0_vect) {
 	_delay_ms(10); // Debouncing
 	if (!(PIND & (1 << Power))) {
 		power_on(); // Toggle DC motor on/off
+	UART_button_on_off++;
+				
+	if (UART_button_on_off == 1 && (OCR0 == LOW))
+	{
+		UART_button_Power++;
+		UART0_str("Power ON\n");
+		_delay_ms(300);
+	}
+				
+	else if(UART_button_on_off == 2)
+	{
+		UART0_str("Power OFF\n");
+		_delay_ms(300);
+		UART_button_on_off = 0;
+		UART_button_Power = 0;
+		UART_button_rote = 0;
+	}
 	}
 }
 
@@ -125,6 +150,29 @@ ISR(INT1_vect) {
 	_delay_ms(10); // Debouncing
 	if (!(PIND & (1 << Speed))) {
 		speed_up(); // Increase speed
+	}
+	UART_button_Power++;
+	
+	if (UART_button_on_off == 1)
+	{
+		char* power_messages[] = {"Power 1\n", "Power 2\n", "Power 3\n"};
+		int flag[] = {LOW, MEDIUM, HIGH};
+		
+		for (uint8_t i = 0; i < 3; i++)
+		{
+			if (UART_button_Power == (i + 1))
+			{
+				UART0_str(power_messages[i]);
+				OCR0 = flag[i];
+				_delay_ms(300);
+				
+				if (i == 2)
+				{
+					UART_button_Power = 0;
+				}
+				break;
+			}
+		}
 	}
 }
 
@@ -134,4 +182,28 @@ ISR(INT2_vect) {
 		if(motor_on)
 		servo_on = !servo_on; // Toggle servo motor on/off
 	}
+		UART_button_rote++;
+		
+		if(UART_button_on_off == 1)
+		{
+			char* Rotation_messages[] = {"Rotation ON\n", "Rotation OFF\n"};
+			
+			for (uint8_t i = 0; i < 2; i++)
+			{
+				if ((UART_button_rote == (i + 1)))
+				{
+					UART0_str(Rotation_messages[i]);
+					_delay_ms(300);
+					
+					if (i == 1)
+					{
+						UART_button_rote = 0;
+					}
+					break;
+				}
+			}
+		}
+	
+	
+	
 }
