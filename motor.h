@@ -34,6 +34,5 @@ void initInterrupts(void);
 void power_on(void);
 void speed_up(void);
 void rotate_servo(void);
-void LED(void);
 
 #endif /* INCFILE1_H_ */

@@ -35,8 +35,7 @@ int main(void) {
 	while (1) {
 		// Rotate servo motor
 		rotate_servo();
-		// Light up LEDs based on DC motor speed
-		LED();
+		
 		if(!(PIND & (1<<DDRD0)))
 				{
 					UART_button_on_off++;

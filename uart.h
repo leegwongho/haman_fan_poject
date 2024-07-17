@@ -10,9 +10,9 @@
 #define UART_H_
 
 #define F_CPU 16000000UL
-#define uart_flag0 0
-#define uart_flag1 0
-#define uart_flag2 0
+// #define uart_flag0 0
+// #define uart_flag1 0
+// #define uart_flag2 0
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>

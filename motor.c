@@ -45,9 +45,12 @@ void power_on() {
 	motor_on = !motor_on;
 	if (motor_on) {
 		OCR0 = LOW;
+		PORTC |= (1 << LED_LOW);
+		PORTC &= ~((1 << LED_MED) | (1 << LED_HIGH));
 	}
 	else {
 		OCR0 = OFF;
+		PORTC = 0x00;
 	}
 }
 
@@ -58,21 +61,26 @@ void speed_up() {
 		switch (speed) {
 			case 0:
 			OCR0 = LOW;
-			uart_flag2 = 0;
-			uart_flag1 = 0;
-			uart_flag0 = 1;
+			PORTC |= (1 << LED_LOW);
+			PORTC &= ~((1 << LED_MED) | (1 << LED_HIGH));
+// 			uart_flag2 = 0;
+// 			uart_flag1 = 0;
+// 			uart_flag0 = 1;
 			break;
 			case 1:
 			OCR0 = MEDIUM;
-			uart_flag0 = 0;
-			uart_flag2 = 0;
-			uart_flag1 = 1;
+			PORTC |= (1 << LED_MED) | (1 << LED_LOW);
+			PORTC &= ~(1 << LED_HIGH);
+// 			uart_flag0 = 0;
+// 			uart_flag2 = 0;
+// 			uart_flag1 = 1;
 			break;
 			case 2:
 			OCR0 = HIGH;
-			uart_flag1 = 0;
-			uart_flag0 = 0;
-			uart_flag2 = 1;
+			PORTC |= (1 << LED_HIGH) | (1 << LED_MED) | (1 << LED_LOW);
+// 			uart_flag1 = 0;
+// 			uart_flag0 = 0;
+// 			uart_flag2 = 1;
 			break;
 		}
 	}
@@ -97,30 +105,6 @@ void rotate_servo() {
 			OCR1A -= 1;
 			_delay_ms(1);
 		}
-	}
-}
-
-// LED control
-void LED() {
-	if(motor_on){
-		// Step 1
-		if(OCR0 == LOW){
-			PORTC |= (1 << LED_LOW);
-			PORTC &= ~((1 << LED_MED) | (1 << LED_HIGH));
-		}
-		// Step 2
-		if(OCR0 == MEDIUM){
-			PORTC |= (1 << LED_MED) | (1 << LED_LOW);
-			PORTC &= ~(1 << LED_HIGH);
-		}
-		// Step 3
-		if(OCR0 == HIGH){
-			PORTC |= (1 << LED_HIGH) | (1 << LED_MED) | (1 << LED_LOW);
-		}
-	}
-	else {
-		// Turn off LEDs if DC motor is off
-		PORTC = 0x00;
 	}
 }
 
