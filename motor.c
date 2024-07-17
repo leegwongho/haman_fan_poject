@@ -44,7 +44,8 @@ void power_on() {
 	motor_on = !motor_on;
 	if (motor_on) {
 		OCR0 = LOW;
-		} else {
+	}
+	else {
 		OCR0 = OFF;
 	}
 }
@@ -75,6 +76,8 @@ void rotate_servo() {
 	else if (OCR1A < 1500) {
 		servo_state = 0;
 	}
+	if(!motor_on)
+		servo_on = 0;
 	if (motor_on && servo_on) {
 		if (!servo_state) {
 			OCR1A += 1;
@@ -128,6 +131,7 @@ ISR(INT1_vect) {
 ISR(INT2_vect) {
 	_delay_ms(10); // Debouncing
 	if (!(PIND & (1 << Spin))) {
-		servo_on = !servo_on; // Toggle servo motor on/off
+		if(motor_on)
+			servo_on = !servo_on; // Toggle servo motor on/off
 	}
 }
