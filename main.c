@@ -43,6 +43,7 @@ int main(void) {
 					
 					if(UART_button_on_off == 1)
 					{
+						UART_button_Power++;
 						UART0_str("Power ON\n");
 						_delay_ms(300);
 					}
