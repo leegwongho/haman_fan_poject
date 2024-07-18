@@ -1,10 +1,43 @@
-#include "motor.h"
-#include "uart.h"
+﻿#include "motor.h"
+#include "ultrasonic.h"
 
 volatile uint8_t motor_on = 0;
 volatile uint8_t speed = 0;
 volatile uint8_t servo_on = 0;
 volatile uint8_t servo_state = 0;
+volatile uint8_t distance = 0;
+volatile uint8_t count0, count1 = 0;
+
+ISR(TIMER2_OVF_vect){
+	if(count0 < 7)
+	count0 += 1;
+	else
+	count0 = 0;
+	rotate_servo();
+	if(count1 < 31)
+	count1 += 1;
+	else{
+		count1 = 0;
+		triggerPin();
+		distance = meanDistance();
+		if(motor_on){
+			if(distance < 10)
+			OCR0 = OFF;
+			else
+			switch (speed) {
+				case 0:
+				OCR0 = LOW;
+				break;
+				case 1:
+				OCR0 = MEDIUM;
+				break;
+				case 2:
+				OCR0 = HIGH;
+				break;
+			}
+		}
+	}
+}
 
 // GPIO setup
 void gpioInit() {
@@ -20,7 +53,8 @@ void gpioInit() {
 void timerInit() {
 	TCCR0 |= (1 << WGM01) | (1 << WGM00);   // Fast PWM
 	TCCR0 |= (1 << COM01);                  // non-inverting
-	TCCR0 |= (1 << CS00);                   // No prescaling
+	TCCR0 |= (1 << CS00) || (1 << CS01);                   // No prescaling
+	// TIMSK |= (1 << TOIE0);
 	OCR0 = 0;
 
 	// Timer1 for Servo
@@ -63,24 +97,15 @@ void speed_up() {
 			OCR0 = LOW;
 			PORTC |= (1 << LED_LOW);
 			PORTC &= ~((1 << LED_MED) | (1 << LED_HIGH));
-// 			uart_flag2 = 0;
-// 			uart_flag1 = 0;
-// 			uart_flag0 = 1;
 			break;
 			case 1:
 			OCR0 = MEDIUM;
 			PORTC |= (1 << LED_MED) | (1 << LED_LOW);
 			PORTC &= ~(1 << LED_HIGH);
-// 			uart_flag0 = 0;
-// 			uart_flag2 = 0;
-// 			uart_flag1 = 1;
 			break;
 			case 2:
 			OCR0 = HIGH;
 			PORTC |= (1 << LED_HIGH) | (1 << LED_MED) | (1 << LED_LOW);
-// 			uart_flag1 = 0;
-// 			uart_flag0 = 0;
-// 			uart_flag2 = 1;
 			break;
 		}
 	}
@@ -88,22 +113,20 @@ void speed_up() {
 
 // Servo motor control
 void rotate_servo() {
-	if (OCR1A > 4500) {
-		servo_state = 1;
-	}
-	else if (OCR1A < 1500) {
-		servo_state = 0;
-	}
 	if(!motor_on)
 	servo_on = 0;
 	if (motor_on && servo_on) {
 		if (!servo_state) {
 			OCR1A += 1;
-			_delay_ms(1);
+			if (OCR1A > 4500) {
+				servo_state = 1;
+			}
 		}
 		else if (servo_state) {
 			OCR1A -= 1;
-			_delay_ms(1);
+			if (OCR1A < 1500) {
+				servo_state = 0;
+			}
 		}
 	}
 }
