@@ -1,4 +1,4 @@
-/*
+﻿/*
  * IncFile1.h
  *
  * Created: 2024-07-17 오전 10:23:10
@@ -34,5 +34,16 @@ void initInterrupts(void);
 void power_on(void);
 void speed_up(void);
 void rotate_servo(void);
+void pause(void);
+
+extern volatile uint8_t motor_on;
+extern volatile uint8_t speed;
+extern volatile uint8_t servo_on;
+extern volatile uint8_t servo_state;
+extern volatile uint8_t distance;
+
+extern volatile uint8_t motor_on;
+extern volatile uint8_t count;
+
 
 #endif /* INCFILE1_H_ */
