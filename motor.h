@@ -1,7 +1,7 @@
-/*
+﻿/*
  * IncFile1.h
  *
- * Created: 2024-07-17 ?��?�� 10:23:10
+ * Created: 2024-07-17 오전 10:23:10
  *  Author: Stardust
  */ 
 

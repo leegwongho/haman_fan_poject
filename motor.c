@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #include "motor.h"
 #include "uart.h"
 
@@ -207,3 +208,5 @@ ISR(INT2_vect) {
 	
 	
 }
+=======
+>>>>>>> parent of c859f9c (first_uart)
