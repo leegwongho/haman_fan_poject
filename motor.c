@@ -1,5 +1,6 @@
 #include "motor.h"
 #include "uart.h"
+#include "fan_lcd.h"
 
 
 volatile uint8_t motor_on = 0;
@@ -9,6 +10,16 @@ volatile uint8_t servo_state = 0;
 volatile uint8_t UART_button_on_off = 0;
 volatile uint8_t UART_button_Power = 0;
 volatile uint8_t UART_button_rote = 0;
+////////////////////////////////////
+volatile uint8_t t_btn0;
+volatile uint8_t t_btn1;
+volatile uint8_t t_btn2;
+volatile uint8_t prevButtonData0;
+volatile uint8_t prevButtonData1;
+volatile uint8_t prevButtonData2;
+extern char state1[4];
+extern char state2[4];
+extern char state3[6];
 
 
 
@@ -52,10 +63,16 @@ void power_on() {
 	motor_on = !motor_on;
 	if (motor_on) {
 		OCR0 = LOW;
+		strcpy(state1, "ON ");
+		strcpy(state2, " 1");
 	}
 	else {
 		OCR0 = OFF;
+		strcpy(state1, "OFF");
+		strcpy(state2, " 0");
+		strcpy(state3, "OFF");
 	}
+	updateLCD(state1, state2, state3);
 }
 
 // Speed toggle
@@ -65,14 +82,18 @@ void speed_up() {
 		switch (speed) {
 			case 0:
 			OCR0 = LOW;
+			strcpy(state2, " 1");
 			break;
 			case 1:
 			OCR0 = MEDIUM;
+			strcpy(state2, " 2");
 			break;
 			case 2:
 			OCR0 = HIGH;
+			strcpy(state2, " 3");
 			break;
 		}
+		updateLCD(state1, state2, state3);
 	}
 }
 
@@ -84,6 +105,7 @@ void rotate_servo() {
 	else if (OCR1A < 1500) {
 		servo_state = 0;
 	}
+	
 	if(!motor_on)
 	servo_on = 0;
 	if (motor_on && servo_on) {
@@ -126,23 +148,26 @@ ISR(INT0_vect) {
 	_delay_ms(10); // Debouncing
 	if (!(PIND & (1 << Power))) {
 		power_on(); // Toggle DC motor on/off
-	UART_button_on_off++;
-				
-	if (UART_button_on_off == 1 && (OCR0 == LOW))
-	{
-		UART_button_Power++;
-		UART0_str("Power ON\n");
-		_delay_ms(300);
-	}
-				
-	else if(UART_button_on_off == 2)
-	{
-		UART0_str("Power OFF\n");
-		_delay_ms(300);
-		UART_button_on_off = 0;
-		UART_button_Power = 0;
-		UART_button_rote = 0;
-	}
+		UART_button_on_off++;
+		
+		if (UART_button_on_off == 1 && (OCR0 == LOW))
+		{
+			UART_button_Power++;
+			UART0_str("Power ON\n");
+			_delay_ms(300);
+		}
+		
+		else if(UART_button_on_off == 2)
+		{
+			UART0_str("Power OFF\n");
+			_delay_ms(300);
+			UART_button_on_off = 0;
+			UART_button_Power = 0;
+			UART_button_rote = 0;
+		}
+		////////////////////////////////////////
+		
+		
 	}
 }
 
@@ -174,6 +199,10 @@ ISR(INT1_vect) {
 			}
 		}
 	}
+	
+	//////////////////////////////////////////
+	
+		
 }
 
 ISR(INT2_vect) {
@@ -181,29 +210,36 @@ ISR(INT2_vect) {
 	if (!(PIND & (1 << Spin))) {
 		if(motor_on)
 		servo_on = !servo_on; // Toggle servo motor on/off
-	}
-		UART_button_rote++;
 		
-		if(UART_button_on_off == 1)
+		if(servo_on)
+		strcpy(state3, "ON");
+		else strcpy(state3, "OFF");
+	}
+	updateLCD(state1, state2, state3);
+	
+	UART_button_rote++;
+	
+	if(UART_button_on_off == 1)
+	{
+		char* Rotation_messages[] = {"Rotation ON\n", "Rotation OFF\n"};
+		
+		for (uint8_t i = 0; i < 2; i++)
 		{
-			char* Rotation_messages[] = {"Rotation ON\n", "Rotation OFF\n"};
-			
-			for (uint8_t i = 0; i < 2; i++)
+			if ((UART_button_rote == (i + 1)))
 			{
-				if ((UART_button_rote == (i + 1)))
+				UART0_str(Rotation_messages[i]);
+				_delay_ms(300);
+				
+				if (i == 1)
 				{
-					UART0_str(Rotation_messages[i]);
-					_delay_ms(300);
-					
-					if (i == 1)
-					{
-						UART_button_rote = 0;
-					}
-					break;
+					UART_button_rote = 0;
 				}
+				break;
 			}
 		}
+	}
 	
+	///////////////////////////////////////////////////
 	
 	
 }

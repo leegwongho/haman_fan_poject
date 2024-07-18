@@ -1,9 +1,14 @@
 #include "motor.h"
 #include "uart.h"
-
-
+#include "fan_lcd.h"
 
 char receive_buff = 0;
+
+char state1[4] = "OFF";
+char state2[4] = " 0";
+char state3[6] = "OFF";
+
+
 
 ISR(USART0_RX_vect)
 {
@@ -12,8 +17,12 @@ ISR(USART0_RX_vect)
 
 
 
-
 int main(void) {
+	LCD_Init();
+	LCD_WriteStringXY(0, 0, "PWR  SPD  SPN");
+	updateLCD(state1, state2, state3);
+	
+	
 	// Initialization
 	gpioInit();
 	timerInit();
@@ -29,6 +38,10 @@ int main(void) {
 	// Initialize servo motor to center position
 	OCR1A = 3000;
 	
+	
+	////////////////////////////////////////	
+	
+	
 	while (1) {
 		// Rotate servo motor
 		rotate_servo();
@@ -41,6 +54,7 @@ int main(void) {
 			UART0_char(receive_buff);
 			receive_buff = 0;
 		}
+					
 	}
 }
 
