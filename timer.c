@@ -1,4 +1,10 @@
-﻿#include "timer.h"
+﻿/*
+ * timer.c
+ *
+ * Created: 2024-07-18 오후 5:04:57
+ *  Author: USER
+ */ 
+#include "timer.h"
 #include "motor.h"
 
 volatile uint16_t timer;

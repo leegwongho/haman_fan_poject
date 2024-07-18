@@ -10,4 +10,7 @@ void timerInit_sonic(void);
 void triggerPin(void);
 uint8_t meanDistance(void);
 
+//void ultrasonic_init(); 
+
+
 #endif /* ULTRASONIC_H_ */

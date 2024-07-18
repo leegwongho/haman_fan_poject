@@ -34,3 +34,9 @@ uint8_t meanDistance() {
 	double pulseWidth = 1000000.0 * TCNT3 * 64 / 16000000;
 	return (uint8_t)(pulseWidth / 58);
 }
+/*
+void ultrasonic_init() {
+	
+
+}
+*/

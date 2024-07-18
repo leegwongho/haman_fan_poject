@@ -23,8 +23,8 @@
 #define LED_MED PORTC1
 #define LED_HIGH PORTC2
 
-#define LOW     155
-#define MEDIUM  205
+#define LOW     128
+#define MEDIUM  192
 #define HIGH    255
 #define OFF     0
 
@@ -37,6 +37,13 @@ void rotate_servo(void);
 void pause(void);
 
 extern volatile uint8_t motor_on;
+extern volatile uint8_t speed;
+extern volatile uint8_t servo_on;
+extern volatile uint8_t servo_state;
+extern volatile uint8_t distance;
+
+extern volatile uint8_t motor_on;
 extern volatile uint8_t count;
+
 
 #endif /* INCFILE1_H_ */

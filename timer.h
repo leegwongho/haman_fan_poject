@@ -1,12 +1,4 @@
-﻿/*
- * timer.h
- *
- * Created: 2024-07-18 오후 4:38:12
- *  Author: Stardust
- */ 
-
-
-#ifndef TIMER_H_
+﻿#ifndef TIMER_H_
 #define TIMER_H_
 
 #define F_CPU 16000000UL
